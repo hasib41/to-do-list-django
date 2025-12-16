@@ -1,27 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My To-Do List</title>
-    
-    <!-- Basic styling to make it look nice -->
+
     <style>
-        /* Reset and base styles */
+        /* ============================================
+           CSS STYLES - Making it look beautiful!
+           ============================================ */
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 40px 20px;
         }
-        
-        /* Main container */
+
         .container {
             max-width: 600px;
             margin: 0 auto;
@@ -30,24 +32,66 @@
             padding: 40px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
-        
-        /* Header */
+
         h1 {
             color: #333;
             text-align: center;
             margin-bottom: 30px;
             font-size: 2.5rem;
         }
-        
+
         h1 span {
             color: #667eea;
         }
-        
-        /* Task list */
+
+        /* ============================================
+           FORM STYLES - Add new task
+           ============================================ */
+
+        .add-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .form-input {
+            flex: 1;
+            padding: 15px 20px;
+            font-size: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus {
+            border-color: #667eea;
+        }
+
+        .add-btn {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        /* ============================================
+           TASK LIST STYLES
+           ============================================ */
+
         .task-list {
             list-style: none;
         }
-        
+
         .task-item {
             display: flex;
             align-items: center;
@@ -57,106 +101,154 @@
             margin-bottom: 10px;
             transition: transform 0.2s, box-shadow 0.2s;
         }
-        
+
         .task-item:hover {
             transform: translateX(5px);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
-        
-        /* Completed tasks */
+
         .task-item.completed {
             background: #d4edda;
+        }
+
+        .task-item.completed .task-title {
             text-decoration: line-through;
             opacity: 0.7;
         }
-        
+
         .task-title {
             flex: 1;
             font-size: 1.1rem;
             color: #333;
         }
-        
+
         .task-date {
             font-size: 0.8rem;
             color: #888;
-        }
-        
-        /* Status indicator */
-        .status {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
             margin-right: 15px;
+        }
+
+        /* ============================================
+           BUTTON STYLES
+           ============================================ */
+
+        .task-actions {
             display: flex;
-            align-items: center;
-            justify-content: center;
+            gap: 8px;
         }
-        
-        .status.pending {
-            background: #ffc107;
+
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: transform 0.2s, opacity 0.2s;
         }
-        
-        .status.done {
+
+        .btn:hover {
+            transform: scale(1.05);
+        }
+
+        .btn-complete {
             background: #28a745;
             color: white;
         }
-        
-        /* Empty state */
-        .empty-state {
-            text-align: center;
-            padding: 40px;
-            color: #888;
+
+        .btn-undo {
+            background: #ffc107;
+            color: #333;
         }
-        
-        .empty-state p {
-            font-size: 1.2rem;
-            margin-bottom: 10px;
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
         }
-        
-        /* Task count */
+
+        /* ============================================
+           EMPTY STATE & COUNT
+           ============================================ */
+
         .task-count {
             text-align: center;
             margin-bottom: 20px;
             color: #666;
         }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+        }
+
+        .empty-state p {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
+
 <body>
     <div class="container">
         <h1>📝 My <span>To-Do</span> List</h1>
-        
-        <!-- Show total task count -->
+
+        <!-- ============================================
+             ADD TASK FORM
+             
+             action="" means submit to same URL
+             method="post" sends data securely
+             {% csrf_token %} is REQUIRED for security!
+             ============================================ -->
+        <form class="add-form" method="post" action="">
+            {% csrf_token %}
+            {{ form.title }}
+            <button type="submit" class="add-btn">Add Task</button>
+        </form>
+
+        <!-- Task count -->
         <p class="task-count">
             You have {{ tasks|length }} task{{ tasks|length|pluralize }}
         </p>
-        
-        <!-- Task list -->
+
+        <!-- ============================================
+             TASK LIST
+             ============================================ -->
         {% if tasks %}
-            <ul class="task-list">
-                {% for task in tasks %}
-                    <li class="task-item {% if task.completed %}completed{% endif %}">
-                        <!-- Status circle -->
-                        <span class="status {% if task.completed %}done{% else %}pending{% endif %}">
-                            {% if task.completed %}✓{% endif %}
-                        </span>
-                        
-                        <!-- Task title -->
-                        <span class="task-title">{{ task.title }}</span>
-                        
-                        <!-- Created date -->
-                        <span class="task-date">
-                            {{ task.created_at|date:"M d, Y" }}
-                        </span>
-                    </li>
-                {% endfor %}
-            </ul>
+        <ul class="task-list">
+            {% for task in tasks %}
+            <li class="task-item {% if task.completed %}completed{% endif %}">
+                <!-- Task title -->
+                <span class="task-title">{{ task.title }}</span>
+
+                <!-- Created date -->
+                <span class="task-date">
+                    {{ task.created_at|date:"M d" }}
+                </span>
+
+                <!-- Action buttons -->
+                <div class="task-actions">
+                    <!-- Toggle complete button -->
+                    <a href="{% url 'tasks:toggle_complete' task.id %}"
+                        class="btn {% if task.completed %}btn-undo{% else %}btn-complete{% endif %}">
+                        {% if task.completed %}Undo{% else %}Done{% endif %}
+                    </a>
+
+                    <!-- Delete button -->
+                    <a href="{% url 'tasks:delete_task' task.id %}" class="btn btn-delete"
+                        onclick="return confirm('Delete this task?')">
+                        Delete
+                    </a>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
         {% else %}
-            <!-- Show this when no tasks exist -->
-            <div class="empty-state">
-                <p>🎉 No tasks yet!</p>
-                <p>Add some tasks in the admin panel.</p>
-            </div>
+        <div class="empty-state">
+            <p>🎉 No tasks yet!</p>
+            <p>Add your first task above!</p>
+        </div>
         {% endif %}
     </div>
 </body>
+
 </html>

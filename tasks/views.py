@@ -1,60 +1,109 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import Task
+from .forms import TaskForm
 
 # ============================================
-# VIEWS - Functions that return web pages
-# ============================================
-# A VIEW is a Python function that:
-# 1. Receives a REQUEST (user asking for a page)
-# 2. Does some work (get data, process forms, etc.)
-# 3. Returns a RESPONSE (usually an HTML page)
+# VIEWS - Functions that handle web requests
 # ============================================
 
 
 def task_list(request):
     """
-    VIEW: Show all tasks to the user.
+    VIEW: Show all tasks AND handle adding new tasks.
     
     URL: / (homepage)
     
+    This view handles TWO things:
+    1. GET request  → Show the task list page
+    2. POST request → Create a new task from form data
+    
+    This is a common pattern in Django!
+    """
+    
+    # Check if user submitted the form (POST request)
+    if request.method == 'POST':
+        # Create a form with the submitted data
+        form = TaskForm(request.POST)
+        
+        # Check if the data is valid
+        if form.is_valid():
+            # Save the new task to database
+            form.save()
+            
+            # Redirect to the same page (prevents double submission)
+            # redirect() sends user to a different URL
+            return redirect('tasks:task_list')
+    else:
+        # GET request - just show empty form
+        form = TaskForm()
+    
+    # Get all tasks from database
+    tasks = Task.objects.all()
+    
+    # Send both tasks and form to template
+    context = {
+        'tasks': tasks,
+        'form': form,
+    }
+    
+    return render(request, 'tasks/task_list.html', context)
+
+
+def toggle_complete(request, task_id):
+    """
+    VIEW: Toggle a task's completed status.
+    
+    URL: /toggle/<task_id>/
+    
     How it works:
-    1. User visits the website
-    2. Django calls this function
-    3. We get all tasks from database
-    4. We put tasks into an HTML template
-    5. We send the HTML back to the user
+    1. Get the task by its ID
+    2. Flip the 'completed' value (True → False, False → True)
+    3. Save the task
+    4. Redirect back to task list
     
     Parameters:
     -----------
-    request : HttpRequest
-        Contains info about the user's request:
-        - request.method → 'GET' or 'POST'
-        - request.user → who is logged in
-        - request.GET → URL parameters
-        - request.POST → form data
-    
-    Returns:
-    --------
-    HttpResponse
-        An HTML page showing all tasks
+    task_id : int
+        The ID of the task to toggle (comes from URL)
     """
     
-    # STEP 1: Get all tasks from database
-    # Task.objects.all() returns a QuerySet (like a list) of all Task objects
-    # Remember: We set ordering = ['-created_at'] in model, so newest first!
-    tasks = Task.objects.all()
+    # get_object_or_404: Get the task OR show 404 error if not found
+    task = get_object_or_404(Task, id=task_id)
     
-    # STEP 2: Create a "context" dictionary
-    # This sends data to the HTML template
-    # Key 'tasks' will be available in the template as {{ tasks }}
-    context = {
-        'tasks': tasks,
-    }
+    # Toggle the completed status
+    # If True → becomes False
+    # If False → becomes True
+    task.completed = not task.completed
     
-    # STEP 3: Render the template with the data
-    # render() combines:
-    #   - The request
-    #   - Template file name ('tasks/task_list.html')
-    #   - Context data (our tasks)
-    # And returns a complete HTML page!
-    return render(request, 'tasks/task_list.html', context)
+    # Save the change to database
+    task.save()
+    
+    # Redirect back to task list
+    return redirect('tasks:task_list')
+
+
+def delete_task(request, task_id):
+    """
+    VIEW: Delete a task.
+    
+    URL: /delete/<task_id>/
+    
+    How it works:
+    1. Get the task by its ID
+    2. Delete it from database
+    3. Redirect back to task list
+    
+    Parameters:
+    -----------
+    task_id : int
+        The ID of the task to delete (comes from URL)
+    """
+    
+    # Get the task or show 404 if not found
+    task = get_object_or_404(Task, id=task_id)
+    
+    # Delete the task from database
+    task.delete()
+    
+    # Redirect back to task list
+    return redirect('tasks:task_list')
