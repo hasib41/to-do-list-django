@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My To-Do List</title>
+    
+    <!-- Basic styling to make it look nice -->
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        
+        /* Main container */
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Header */
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+        }
+        
+        h1 span {
+            color: #667eea;
+        }
+        
+        /* Task list */
+        .task-list {
+            list-style: none;
+        }
+        
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .task-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Completed tasks */
+        .task-item.completed {
+            background: #d4edda;
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+        
+        .task-title {
+            flex: 1;
+            font-size: 1.1rem;
+            color: #333;
+        }
+        
+        .task-date {
+            font-size: 0.8rem;
+            color: #888;
+        }
+        
+        /* Status indicator */
+        .status {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .status.pending {
+            background: #ffc107;
+        }
+        
+        .status.done {
+            background: #28a745;
+            color: white;
+        }
+        
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+        }
+        
+        .empty-state p {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        
+        /* Task count */
+        .task-count {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📝 My <span>To-Do</span> List</h1>
+        
+        <!-- Show total task count -->
+        <p class="task-count">
+            You have {{ tasks|length }} task{{ tasks|length|pluralize }}
+        </p>
+        
+        <!-- Task list -->
+        {% if tasks %}
+            <ul class="task-list">
+                {% for task in tasks %}
+                    <li class="task-item {% if task.completed %}completed{% endif %}">
+                        <!-- Status circle -->
+                        <span class="status {% if task.completed %}done{% else %}pending{% endif %}">
+                            {% if task.completed %}✓{% endif %}
+                        </span>
+                        
+                        <!-- Task title -->
+                        <span class="task-title">{{ task.title }}</span>
+                        
+                        <!-- Created date -->
+                        <span class="task-date">
+                            {{ task.created_at|date:"M d, Y" }}
+                        </span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <!-- Show this when no tasks exist -->
+            <div class="empty-state">
+                <p>🎉 No tasks yet!</p>
+                <p>Add some tasks in the admin panel.</p>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

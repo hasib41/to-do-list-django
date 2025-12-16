@@ -15,8 +15,13 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include  # Added include!
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    
+    # Include all URLs from the tasks app
+    # '' means at the root (homepage)
+    # So tasks URLs will be at /, /add/, /edit/, etc.
+    path('', include('tasks.urls')),
 ]
