@@ -1,25 +1,7 @@
-# Django #
-*.log
-*.pot
-*.pyc
+# =========================
+# Python
+# =========================
 __pycache__/
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
-media/
-
-# Virtual Environment #
-venv/
-.venv/
-ENV/
-
-# IDE #
-.vscode/
-.idea/
-*.sublime-project
-*.sublime-workspace
-
-# Python #
 *.py[cod]
 *$py.class
 *.so
@@ -40,27 +22,68 @@ wheels/
 .installed.cfg
 *.egg
 
-# Environment Variables #
+# =========================
+# Virtual Environment
+# =========================
+venv/
+ENV/
+env/
+.venv/
+
+# =========================
+# Django
+# =========================
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+
+# Static files collected by collectstatic
+staticfiles/
+
+# =========================
+# IDE / Editor
+# =========================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+.settings/
+
+# =========================
+# OS Generated
+# =========================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# =========================
+# Environment Variables
+# =========================
 .env
 .env.local
+.env.production
 *.env
 
-# Static files (collected for production) #
-staticfiles/
-static_collected/
-
-# Coverage reports #
+# =========================
+# Coverage & Testing
+# =========================
 htmlcov/
+.tox/
+.nox/
 .coverage
 .coverage.*
 .cache
-
-# Pytest #
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
 .pytest_cache/
-
-# macOS #
-.DS_Store
-
-# Windows #
-Thumbs.db
-desktop.ini
