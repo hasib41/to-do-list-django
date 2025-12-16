@@ -40,10 +40,17 @@ def task_list(request):
     # Get all tasks from database
     tasks = Task.objects.all()
     
+    # Calculate stats
+    completed_count = tasks.filter(completed=True).count()
+    pending_count = tasks.filter(completed=False).count()
+    
     # Send both tasks and form to template
     context = {
         'tasks': tasks,
         'form': form,
+        'total_count': tasks.count(),
+        'completed_count': completed_count,
+        'pending_count': pending_count,
     }
     
     return render(request, 'tasks/task_list.html', context)
